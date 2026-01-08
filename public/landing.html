@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Runway</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Mobile-First Base Styles */
+        body { 
+            display: block; 
+            overflow-y: auto; 
+            height: auto;
+            min-height: 100vh;
+        }
+
+        .app-shell {
+            max-width: 100%; 
+            box-shadow: none; 
+            padding: 0; 
+            min-height: auto;
+        }
+
+        /* Header Layout */
+        header {
+            width: 100%;
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero Section - Compact by default */
+        .hero-section {
+            padding: 60px 20px 40px 20px; /* Reduced padding for mobile */
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s var(--ease-out-expo);
+        }
+
+        .hero-title {
+            font-size: 36px; /* Smaller font for mobile */
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            letter-spacing: -0.03em;
+            background: linear-gradient(180deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 16px; /* Readable mobile text */
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.5;
+            font-weight: 400;
+            padding: 0 10px;
+        }
+
+        /* Action Buttons - Stack vertically on mobile */
+        .hero-actions {
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            justify-content: center; 
+            width: 100%;
+        }
+
+        .hero-actions .btn {
+            width: 100%; /* Full width buttons on mobile */
+            padding: 0;
+            height: 50px;
+        }
+
+        /* Feature Grid - Single column by default */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Stacked */
+            gap: 16px;
+            max-width: 1024px;
+            margin: 20px auto 60px auto;
+            padding: 0 20px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            padding: 24px;
+            border-radius: 20px;
+        }
+
+        .code-snippet {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            font-size: 11px; /* Smaller mono font */
+            background: #000;
+            padding: 16px;
+            border-radius: 12px;
+            color: var(--status-positive);
+            overflow-x: auto;
+            margin-top: 20px;
+            border: 1px solid var(--border-default);
+            line-height: 1.4;
+            white-space: pre; /* Keep code formatting */
+        }
+
+        footer {
+            text-align: center; 
+            padding: 32px 20px; 
+            color: var(--text-secondary); 
+            font-size: 13px; 
+            border-top: 1px solid var(--border-default);
+            padding-bottom: 80px; /* Space for bottom nav bars on mobile */
+        }
+
+        /* Desktop Enhancements (Min-width 768px) */
+        @media (min-width: 768px) {
+            .hero-section {
+                padding: 120px 24px;
+            }
+
+            .hero-title {
+                font-size: 56px;
+                margin-bottom: 24px;
+                letter-spacing: -0.04em;
+            }
+
+            .hero-sub {
+                font-size: 20px;
+                margin-bottom: 48px;
+                line-height: 1.6;
+            }
+
+            .hero-actions {
+                flex-direction: row; /* Side-by-side on desktop */
+                width: auto;
+                gap: 16px;
+            }
+
+            .hero-actions .btn {
+                width: auto;
+                padding: 0 40px;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 Columns */
+                gap: 24px;
+                margin-top: 40px;
+            }
+
+            .feature-card:hover {
+                transform: translateY(-4px);
+                border-color: var(--accent-primary);
+                transition: transform 0.3s ease;
+            }
+            
+            .code-snippet {
+                font-size: 13px;
+            }
+
+            footer {
+                padding-bottom: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        
+        <header>
+            <div class="brand" style="font-size: 20px;">Runway</div>
+            <div style="display: flex; gap: 8px;">
+                <a href="/login" class="btn btn-secondary btn-small" style="width: auto; font-size: 13px; padding: 0 16px;">Sign In</a>
+                <a href="/register" class="btn btn-primary btn-small" style="width: auto; font-size: 13px; padding: 0 16px;">Get Started</a>
+            </div>
+        </header>
+
+        <section class="hero-section">
+            <div class="label" style="margin-bottom: 12px; color: var(--accent-primary); font-size: 10px;">v0.5.2-beta.1</div>
+            <h1 class="hero-title">Can you afford this today?</h1>
+            <p class="hero-sub">
+                Runway is a zero-dependency financial engine that uses Monte Carlo simulations to forecast your solvency. 
+                No budgeting. No judgment.
+            </p>
+            
+            <div class="hero-actions">
+                <a href="/register" class="btn btn-primary">Start Modeling</a>
+                <a href="https://github.com/ParasSharma2306/runway" target="_blank" class="btn btn-secondary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    Source Code
+                </a>
+            </div>
+        </section>
+
+        <section class="feature-grid">
+            
+            <div class="feature-card">
+                <h3 style="font-size: 18px; margin-bottom: 10px; font-weight: 700;">The Engine</h3>
+                <p style="color: var(--text-secondary); line-height: 1.5; font-size: 14px;">
+                    Your transaction history is converted into a daily spend vector. We run <strong>2,000 simulations</strong> per render.
+                </p>
+                <div class="code-snippet">
+const forecast = calculateForecast(
+  balance, 
+  transactions, 
+  buffer, 
+  Date.now()
+);</div>
+            </div>
+
+            <div class="feature-card">
+                <h3 style="font-size: 18px; margin-bottom: 10px; font-weight: 700;">Client-Side Sovereignty</h3>
+                <p style="color: var(--text-secondary); line-height: 1.5; font-size: 14px;">
+                    Runway rejects the SaaS dogma. Your financial ledger lives in <strong>IndexedDB</strong> on your device. The server is only used for encrypted backup.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <h3 style="font-size: 18px; margin-bottom: 10px; font-weight: 700;">Simulation Vector</h3>
+                <p style="color: var(--text-secondary); line-height: 1.5; font-size: 14px;">
+                    Inject hypothetical spend events into the state tree. The engine re-computes your zero-date instantly without touching real data.
+                </p>
+            </div>
+
+        </section>
+
+        <footer>
+            <p>Runway v0.5.2-beta.1</p>
+            <p style="margin-top: 8px;">Designed and developed by <a href="https://parassharma.in" class="link link-secondary">Paras Sharma</a></p>
+        </footer>
+
+    </div>
+    <script type="module" src="/js/theme.js"></script>
+</body>
+</html>

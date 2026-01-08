@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Runway</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('runway_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-shell" style="justify-content: center;">
+        <main class="card" style="padding: 32px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+                 <a href="/" style="text-decoration: none; color: inherit;"><h1 class="brand">Join Runway</h1></a>
+            </div>
+            
+            <form id="reg-form" style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label class="label">Email</label>
+                    <input type="email" id="email" class="input-field" required>
+                </div>
+                <div>
+                    <label class="label">Password</label>
+                    <input type="password" id="password" class="input-field" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+
+            <form id="verify-form" style="display: none; flex-direction: column; gap: 16px;">
+                <p style="font-size: 14px; text-align: center; color: var(--text-secondary);">Enter the 6-digit code sent to your email.</p>
+                <input type="text" id="otp" placeholder="123456" maxlength="6" class="input-field" required style="text-align: center; letter-spacing: 4px; font-size: 20px;">
+                <button type="submit" class="btn btn-primary">Verify & Login</button>
+            </form>
+
+            <div id="status-msg" style="margin-top: 16px; font-size: 13px; text-align: center; color: var(--status-negative);"></div>
+            
+            <div class="auth-footer">
+                <a href="/login" class="link">Already have an account?</a>
+            </div>
+        </main>
+        
+        <div class="auth-footer" style="margin-top: 24px;">
+            <span style="font-size: 12px; color: var(--text-secondary);">Designed and developed by <a href="https://parassharma.in" target="_blank" class="link link-secondary">Paras Sharma</a></span>
+        </div>
+    </div>
+
+    <script>
+        const regForm = document.getElementById('reg-form');
+        const verifyForm = document.getElementById('verify-form');
+        const msg = document.getElementById('status-msg');
+        let userEmail = '';
+
+        regForm.onsubmit = async (e) => {
+            e.preventDefault();
+            msg.textContent = 'Sending code...';
+            userEmail = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: userEmail, password })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error);
+
+                regForm.style.display = 'none';
+                verifyForm.style.display = 'flex';
+                msg.textContent = '';
+            } catch(err) {
+                msg.textContent = err.message;
+            }
+        };
+
+        verifyForm.onsubmit = async (e) => {
+            e.preventDefault();
+            msg.textContent = 'Verifying...';
+            const otp = document.getElementById('otp').value;
+
+            try {
+                const res = await fetch('/auth/verify', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: userEmail, otp })
+                });
+                if(!res.ok) throw new Error((await res.json()).error);
+                window.location.href = '/login';
+            } catch(err) {
+                msg.textContent = err.message;
+            }
+        };
+    </script>
+</body>
+</html>

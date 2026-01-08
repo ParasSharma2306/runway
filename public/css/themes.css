@@ -1,0 +1,40 @@
+:root {
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+    --radius-l: 24px;
+    --radius-m: 16px;
+    --spacing: 20px;
+}
+
+/* THEME: DARK (Default) */
+[data-theme="dark"] {
+    --bg-app: #000000;
+    --bg-card: #1C1C1E; /* Apple Dark Grey */
+    
+    --text-primary: #F5F5F7;
+    --text-secondary: #86868B;
+    
+    --border-default: #38383A;
+    
+    --accent-primary: #0A84FF; /* iOS Blue Dark Mode */
+    --accent-inverse: #FFFFFF;
+    
+    --status-positive: #30D158;
+    --status-negative: #FF453A;
+}
+
+/* THEME: APPLE LIGHT */
+[data-theme="light"] {
+    --bg-app: #F5F5F7;
+    --bg-card: #FFFFFF;
+    
+    --text-primary: #1D1D1F;
+    --text-secondary: #86868B;
+    
+    --border-default: rgba(0,0,0,0.1);
+    
+    --accent-primary: #0071E3; /* iOS Blue Light Mode */
+    --accent-inverse: #FFFFFF;
+    
+    --status-positive: #34C759;
+    --status-negative: #FF3B30;
+}

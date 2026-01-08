@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console - Runway</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-section { margin-bottom: 32px; animation: slideUp 0.6s var(--ease-out-expo) backwards; }
+        
+        .list-header {
+            display: flex;
+            padding: 12px 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        
+        .list-item {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 16px;
+            border-bottom: 1px solid var(--border-default);
+            font-size: 14px;
+        }
+        .list-item:last-child { border-bottom: none; }
+        
+        .col-main { flex: 2; font-weight: 500; }
+        .col-sub { flex: 1; color: var(--text-secondary); }
+        .col-action { flex: 0 0 80px; text-align: right; }
+
+        .status-badge {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-active { background-color: var(--status-positive); }
+        .status-inactive { background-color: var(--status-negative); }
+
+        .btn-toggle {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+            background: rgba(125,125,125,0.1);
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+        }
+        .btn-toggle:hover { background: rgba(125,125,125,0.2); }
+
+        .log-meta { font-family: monospace; font-size: 12px; color: var(--accent-primary); }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <h1 class="brand">Admin</h1>
+        </header>
+
+        <main class="dashboard">
+            <section class="admin-section">
+                <span class="label">User Management</span>
+                <div class="card" style="padding: 0;">
+                    <div class="list-header">
+                        <span class="col-main">User</span>
+                        <span class="col-sub">Role</span>
+                        <span class="col-action">State</span>
+                    </div>
+                    <div id="user-list">
+                        <div style="padding: 24px; text-align: center; color: var(--text-secondary);">Loading users...</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="admin-section" style="animation-delay: 0.1s;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span class="label" style="margin: 0;">Activity Logs</span>
+                    <select id="filter-action" class="input-field" style="width: auto; padding: 4px 8px; font-size: 12px; height: 30px;">
+                        <option value="">All Actions</option>
+                        <option value="LOGIN">Login</option>
+                        <option value="USER_STATUS_UPDATE">User Status</option>
+                        <option value="CREATE_TICKET">Tickets</option>
+                        <option value="UPDATE_STATUS">Status Changes</option>
+                    </select>
+                </div>
+                
+                <div class="card" style="padding: 0; max-height: 400px; overflow-y: auto;">
+                    <div id="log-list">
+                        <div style="padding: 24px; text-align: center; color: var(--text-secondary);">Loading logs...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="nav-bar">
+            <a href="/" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>Home</span>
+            </a>
+            <a href="/admin" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>Admin</span>
+            </a>
+            <a href="/settings" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script type="module">
+        import { showToast } from '/js/toast.js';
+
+        const loadUsers = async () => {
+            const list = document.getElementById('user-list');
+            try {
+                const res = await fetch('/api/admin/users');
+                if (!res.ok) throw new Error();
+                const users = await res.json();
+
+                list.innerHTML = users.map(u => `
+                    <div class="list-item">
+                        <div class="col-main">
+                            <span class="status-badge ${u.isActive ? 'status-active' : 'status-inactive'}"></span>
+                            ${u.email}
+                        </div>
+                        <div class="col-sub" style="text-transform: capitalize;">${u.role}</div>
+                        <div class="col-action">
+                            <button class="btn-toggle" onclick="toggleUser('${u._id}', ${!u.isActive})">
+                                ${u.isActive ? 'Disable' : 'Enable'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                list.innerHTML = '<div style="padding:16px; color:var(--status-negative)">Failed to load users</div>';
+            }
+        };
+
+        const loadLogs = async () => {
+            const list = document.getElementById('log-list');
+            const actionFilter = document.getElementById('filter-action').value;
+            
+            try {
+                const query = actionFilter ? `?action=${actionFilter}` : '';
+                const res = await fetch(`/api/admin/logs${query}`);
+                if (!res.ok) throw new Error();
+                const logs = await res.json();
+
+                list.innerHTML = logs.map(l => {
+                    const date = new Date(l.createdAt).toLocaleString();
+                    const email = l.userId ? l.userId.email : 'Unknown';
+                    return `
+                        <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+                            <div style="display:flex; justify-content:space-between; width:100%;">
+                                <span style="font-weight:600; font-size:13px;">${l.action}</span>
+                                <span class="log-meta">${date}</span>
+                            </div>
+                            <div style="font-size:13px; color:var(--text-secondary);">
+                                User: ${email}
+                            </div>
+                            ${l.metadata ? `<div class="log-meta" style="color:var(--text-secondary); opacity:0.7;">${JSON.stringify(l.metadata)}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                list.innerHTML = '<div style="padding:16px; color:var(--status-negative)">Failed to load logs</div>';
+            }
+        };
+        
+        window.toggleUser = async (id, isActive) => {
+            if(!confirm(`Are you sure you want to ${isActive ? 'enable' : 'disable'} this user?`)) return;
+            
+            try {
+                const res = await fetch(`/api/admin/users/${id}/status`, {
+                    method: 'PATCH',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ isActive })
+                });
+                
+                if (res.ok) {
+                    showToast('User status updated', 'success');
+                    loadUsers();
+                    loadLogs(); 
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || 'Failed', 'error');
+                }
+            } catch (err) {
+                showToast('Network error', 'error');
+            }
+        };
+
+        document.getElementById('filter-action').onchange = loadLogs;
+
+        loadUsers();
+        loadLogs();
+    </script>
+</body>
+</html>

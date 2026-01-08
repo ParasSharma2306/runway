@@ -1,0 +1,31 @@
+{
+  "name": "runway",
+  "version": "0.5.2-beta.1",
+  "description": "offline-first burn-rate planner",
+  "homepage": "https://github.com/ParasSharma2306/runway#readme",
+  "bugs": {
+    "url": "https://github.com/ParasSharma2306/runway/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ParasSharma2306/runway.git"
+  },
+  "license": "MIT",
+  "author": "ParasSharma2306",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-mongo": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "mongoose": "^9.1.2",
+    "nodemailer": "^7.0.12"
+  }
+}

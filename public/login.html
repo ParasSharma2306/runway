@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Runway</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-shell" style="justify-content: center;">
+        <main class="card" style="padding: 32px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+                 <a href="/" style="text-decoration: none; color: inherit;"><h1 class="brand" style="font-size: 24px;">Runway</h1></a>
+            </div>
+            
+            <form id="login-form" style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label class="label" for="email">Email</label>
+                    <input type="email" id="email" class="input-field" required>
+                </div>
+                
+                <div>
+                    <label class="label" for="password">Password</label>
+                    <input type="password" id="password" class="input-field" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="btn-submit">Sign In</button>
+            </form>
+
+            <div class="auth-footer">
+                <a href="/register" class="link">Create Account</a>
+                <a href="/reset-password" class="link link-secondary">Forgot Password?</a>
+            </div>
+        </main>
+        
+        <div class="auth-footer" style="margin-top: 20px;">
+             <span id="app-version" style="color: var(--text-secondary); font-size: 12px;">Loading...</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkVersion } from '/js/version.js';
+        import { showToast } from '/js/toast.js';
+        
+        window.addEventListener('load', async () => {
+             await checkVersion();
+             if (window.__RUNWAY_VERSION__) {
+                 const v = window.__RUNWAY_VERSION__;
+                 document.getElementById('app-version').textContent = `v${v.version} (${v.environment})`;
+             }
+        });
+
+        const form = document.getElementById('login-form');
+        const btnSubmit = document.getElementById('btn-submit');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            btnSubmit.textContent = 'Signing in...';
+            btnSubmit.disabled = true;
+
+            try {
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Login failed');
+
+                showToast('Welcome back!', 'success');
+                
+                setTimeout(() => {
+                    if (data.user && data.user.role === 'admin') {
+                        window.location.href = '/admin';
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
+                }, 500);
+
+            } catch (err) {
+                showToast(err.message, 'error');
+                btnSubmit.textContent = 'Sign In';
+                btnSubmit.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

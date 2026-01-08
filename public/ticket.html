@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Detail</title>
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-shell" style="height: 100vh; display: flex; flex-direction: column;">
+        <header class="app-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="/tickets.html" class="btn-icon">←</a>
+                <span class="brand" id="header-id">#Loading</span>
+            </div>
+            <div id="action-area"></div>
+        </header>
+
+        <div id="meta-card" class="card" style="padding: 16px; margin-bottom: 16px; flex-shrink: 0;">
+            <h2 id="t-title" style="font-size: 18px; margin-bottom: 8px;">Loading...</h2>
+            <div style="display: flex; gap: 12px; font-size: 13px; color: var(--text-secondary);">
+                <span id="t-status" style="font-weight: 600;">--</span>
+                <span id="t-priority">--</span>
+            </div>
+        </div>
+
+        <div id="chat-container" class="chat-container">
+            </div>
+
+        <div style="padding-top: 10px; border-top: 1px solid var(--border-default); flex-shrink: 0;">
+            <textarea id="reply-box" rows="2" placeholder="Write a reply..." class="input-field" style="margin-bottom: 12px;"></textarea>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label id="internal-toggle" class="checkbox-label" style="display: none; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                    <input type="checkbox" id="chk-internal"> Internal Note
+                </label>
+                
+                <button id="btn-send" class="btn btn-primary btn-small" style="margin-left: auto;">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import '/js/version.js';
+
+        const params = new URLSearchParams(window.location.search);
+        const ticketId = params.get('id');
+        const chatContainer = document.getElementById('chat-container');
+
+        let currentUserEmail = '';
+
+        const renderMessage = (msg) => {
+            const isMe = msg.sender.email === currentUserEmail;
+            const div = document.createElement('div');
+            
+            let extraClass = '';
+            if (msg.isInternal) extraClass = 'msg-internal';
+            else extraClass = isMe ? 'msg-own' : 'msg-other';
+
+            div.className = `msg-bubble ${extraClass}`;
+            
+            const time = new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            
+            div.innerHTML = `
+                <div class="msg-meta">
+                    <span>${msg.sender.email} ${msg.isInternal ? '(INTERNAL)' : ''}</span>
+                    <span>${time}</span>
+                </div>
+                <div>${msg.content}</div>
+            `;
+            return div;
+        };
+
+        const loadData = async () => {
+            const authRes = await fetch('/auth/me');
+            if (authRes.status === 401) window.location.href = '/'; // Redirect to login
+            const authData = await authRes.json();
+            currentUserEmail = authData.user.email;
+
+            if (['admin', 'support'].includes(authData.user.role)) {
+                document.getElementById('internal-toggle').style.display = 'flex';
+                
+                const actionArea = document.getElementById('action-area');
+                actionArea.innerHTML = `
+                    <select id="status-select" class="input-field" style="padding: 6px 10px; width: auto; font-size: 13px; margin: 0;">
+                        <option value="open">Open</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                `;
+                
+                const statusSelect = document.getElementById('status-select');
+                statusSelect.onchange = async (e) => {
+                    await fetch(`/api/tickets/${ticketId}/status`, {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ status: e.target.value })
+                    });
+                };
+            }
+
+            const res = await fetch(`/api/tickets/${ticketId}`);
+            if (!res.ok) { alert('Error loading ticket'); return; }
+            
+            const { ticket, messages } = await res.json();
+
+            document.getElementById('header-id').textContent = `Ticket #${ticket._id.slice(-4)}`;
+            document.getElementById('t-title').textContent = ticket.title;
+            document.getElementById('t-status').textContent = ticket.status.toUpperCase();
+            document.getElementById('t-priority').textContent = ticket.priority.toUpperCase();
+            
+            const statusSelect = document.getElementById('status-select');
+            if (statusSelect) statusSelect.value = ticket.status;
+
+            chatContainer.innerHTML = '';
+            
+            const descMsg = {
+                sender: ticket.createdBy,
+                content: ticket.description,
+                createdAt: ticket.createdAt,
+                isInternal: false
+            };
+            chatContainer.appendChild(renderMessage(descMsg));
+            
+            messages.forEach(m => chatContainer.appendChild(renderMessage(m)));
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+
+        document.getElementById('btn-send').onclick = async () => {
+            const content = document.getElementById('reply-box').value;
+            const isInternal = document.getElementById('chk-internal').checked;
+            if (!content) return;
+
+            const res = await fetch(`/api/tickets/${ticketId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content, isInternal })
+            });
+
+            if (res.ok) {
+                document.getElementById('reply-box').value = '';
+                loadData();
+            }
+        };
+
+        loadData();
+    </script>
+</body>
+</html>
